@@ -10,7 +10,7 @@ router.get('/departments', async (req, res) => {
   catch(err) {
     res.status(500).json({ message: err });
   }
-  
+
 });
 
 router.get('/departments/random', async (req, res) => {
@@ -44,7 +44,6 @@ router.get('/departments/:id', async (req, res) => {
 router.post('/departments', async (req, res) => {
 
   try {
-
     const { name } = req.body;
     const newDepartment = new Department({ name: name });
     await newDepartment.save();
@@ -62,8 +61,9 @@ router.put('/departments/:id', async (req, res) => {
   try {
     const dep = await(Department.findById(req.params.id));
     if(dep) {
-      await Department.updateOne({ _id: req.params.id }, { $set: { name: name }});
-      res.json({ message: 'OK' });
+      dep.name = name;
+      await dep.save();
+      res.json({ message: 'OK' , model: dep });
     }
     else res.status(404).json({ message: 'Not found...' });
   }
@@ -79,7 +79,7 @@ router.delete('/departments/:id', async (req, res) => {
     const dep = await(Department.findById(req.params.id));
     if(dep) {
       await Department.deleteOne({ _id: req.params.id });
-      res.json({ message: 'OK' });
+      res.json({ message: 'OK', deletedDocument: dep });
     }
     else res.status(404).json({ message: 'Not found...' });
   }
